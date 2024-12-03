@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Angkatan
+from .models import Angkatan, Prodi
 
 def home(request):
     return render(request, 'index.html')
@@ -79,6 +79,73 @@ def delete_angkatan(request, id):
         angkatan.delete()
         messages.success(request, 'Data Angkatan berhasil dihapus!')
         return redirect('angkatan')  # Kembali ke halaman tabel
+    
+def prodi(request):
+    # Ambil semua data dari model Prodi
+    data_prodi = Prodi.objects.all()
+    return render(request, 'prodi.html', {'data_prodi': data_prodi})
+
+def tambah_prodi(request):
+    if request.method == 'POST':
+        prodi_name = request.POST.get('prodi')
+
+        if not prodi_name:
+            messages.error(request, "Nama program studi tidak boleh kosong.")
+            return render(request, 'tambah_prodi.html')
+
+        if len(prodi_name) > 25:  # Validasi panjang nama prodi
+            messages.error(request, "Nama program studi tidak boleh lebih dari 25 karakter.")
+            return render(request, 'tambah_prodi.html')
+
+        # Cek apakah program studi sudah ada
+        if Prodi.objects.filter(prodi__iexact=prodi_name).exists():
+            messages.error(request, f"Program studi '{prodi_name}' sudah ada.")
+        else:
+            # Simpan data ke database
+            Prodi.objects.create(prodi=prodi_name)
+            messages.success(request, f"Program studi '{prodi_name}' berhasil ditambahkan.")
+            return redirect('prodi')  # Redirect setelah berhasil menambahkan
+
+    return render(request, 'tambah_prodi.html')
+
+def edit_prodi(request, id):
+    # Ambil data prodi berdasarkan ID
+    prodi = get_object_or_404(Prodi, id=id)
+
+    if request.method == 'POST':
+        prodi_name = request.POST.get('prodi')
+
+        if not prodi_name:
+            messages.error(request, "Nama program studi tidak boleh kosong.")
+            return render(request, 'edit_prodi.html', {'prodi': prodi})
+
+        if len(prodi_name) > 25:
+            messages.error(request, "Nama program studi tidak boleh lebih dari 25 karakter.")
+            return render(request, 'edit_prodi.html', {'prodi': prodi})
+
+        # Cek apakah nama program studi sudah ada dan bukan data yang sedang diedit
+        if Prodi.objects.filter(prodi__iexact=prodi_name).exclude(id=id).exists():
+            messages.error(request, f"Program studi '{prodi_name}' sudah ada.")
+        else:
+            # Update data
+            prodi.prodi = prodi_name
+            prodi.save()
+            messages.success(request, "Data program studi berhasil diperbarui.")
+            return redirect('prodi')  # Redirect ke halaman daftar prodi
+
+    return render(request, 'edit_prodi.html', {'prodi': prodi})
+
+def hapus_prodi(request, id):
+    # Ambil data prodi berdasarkan ID
+    prodi = get_object_or_404(Prodi, id=id)
+
+    if request.method == 'POST':  # Pastikan penghapusan dilakukan melalui metode POST
+        prodi.delete()
+        messages.success(request, f"Program studi '{prodi.prodi}' berhasil dihapus.")
+        return redirect('prodi')  # Redirect ke halaman daftar prodi
+
+    return render(request, 'hapus_prodi.html', {'prodi': prodi})
+
     
 def mahasiswa(request):
     return render(request, 'mahasiswa.html')
