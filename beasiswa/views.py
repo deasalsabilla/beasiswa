@@ -147,7 +147,13 @@ def hapus_prodi(request, id):
     return render(request, 'hapus_prodi.html', {'prodi': prodi})
 
 def mahasiswa(request):
-    return render(request, 'mahasiswa.html')
+    # Ambil semua data mahasiswa
+    mahasiswa_list = Mahasiswa.objects.select_related('prodi', 'angkatan').all()
+
+    context = {
+        'mahasiswa_list': mahasiswa_list,
+    }
+    return render(request, 'mahasiswa.html', context)
 
 def tambah_mahasiswa(request):
     if request.method == "POST":
@@ -188,3 +194,50 @@ def tambah_mahasiswa(request):
         'prodi_list': prodi_list,
     }
     return render(request, 'tambah_mahasiswa.html', context)
+
+def edit_mahasiswa(request, id):
+    # Ambil data mahasiswa berdasarkan ID, atau kembalikan 404 jika tidak ditemukan
+    mahasiswa = get_object_or_404(Mahasiswa, id=id)
+
+    if request.method == "POST":
+        nim = request.POST.get("nim")
+        nama = request.POST.get("nama")
+        prodi_id = request.POST.get("prodi")
+        angkatan_id = request.POST.get("angkatan")
+
+        # Validasi input
+        if not nim or not nama or not prodi_id or not angkatan_id:
+            messages.error(request, "Semua field harus diisi.")
+            return redirect("edit_mahasiswa", id=id)
+        
+        if len(nim) > 8:
+            messages.error(request, "NIM tidak boleh lebih dari 8 karakter.")
+            return redirect("edit_mahasiswa", id=id)
+
+        try:
+            # Update data mahasiswa
+            mahasiswa.nim = nim
+            mahasiswa.nama = nama
+            mahasiswa.prodi = Prodi.objects.get(id=prodi_id)
+            mahasiswa.angkatan = Angkatan.objects.get(id=angkatan_id)
+            mahasiswa.save()
+
+            messages.success(request, "Data mahasiswa berhasil diperbarui.")
+            return redirect("mahasiswa")  # Ganti dengan nama URL daftar mahasiswa
+        except Prodi.DoesNotExist:
+            messages.error(request, "Program Studi tidak ditemukan.")
+        except Angkatan.DoesNotExist:
+            messages.error(request, "Tahun Angkatan tidak ditemukan.")
+        except Exception as e:
+            messages.error(request, f"Terjadi kesalahan: {e}")
+
+    # Ambil data Prodi dan Angkatan untuk select option
+    prodi_list = Prodi.objects.all()
+    angkatan_list = Angkatan.objects.all()
+
+    context = {
+        'mahasiswa': mahasiswa,
+        'prodi_list': prodi_list,
+        'angkatan_list': angkatan_list,
+    }
+    return render(request, 'edit_mahasiswa.html', context)

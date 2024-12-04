@@ -79,19 +79,41 @@
               <!-- Table with stripped rows -->
               <table class="table table-striped mt-2">
                 <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">NIM</th>
-                    <th scope="col">Nama</th>
-                    <th scope="col">Prodi</th>
-                    <th scope="col">Angkatan</th>
-                    <th scope="col">Aksi</th>
-                  </tr>
+                    <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">NIM</th>
+                        <th scope="col">Nama</th>
+                        <th scope="col">Prodi</th>
+                        <th scope="col">Angkatan</th>
+                        <th scope="col">Aksi</th>
+                    </tr>
                 </thead>
                 <tbody>
-                 
+                    {% if mahasiswa_list %}
+                        {% for mahasiswa in mahasiswa_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ mahasiswa.nim }}</td>
+                            <td>{{ mahasiswa.nama }}</td>
+                            <td>{{ mahasiswa.prodi.prodi }}</td>
+                            <td>{{ mahasiswa.angkatan.angkatan }}</td>
+                            <td>
+                              <a href="{% url 'edit_mahasiswa' mahasiswa.id %}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+                              <form action="" method="post" style="display:inline;">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');"><i class="bi bi-trash"></i> Hapus</button>
+                                </form>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Tidak ada data mahasiswa.</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
-              </table>
+            </table>
+            
               
               <!-- End Table with stripped rows -->
 

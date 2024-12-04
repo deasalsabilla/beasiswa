@@ -15,4 +15,5 @@ urlpatterns = [
     path("kelola-prodi/hapus/<int:id>/", views.hapus_prodi, name="hapus_prodi"),
     path("kelola-mahasiswa/", views.mahasiswa, name='mahasiswa'),
     path("kelola-mahasiswa/tambah", views.tambah_mahasiswa, name='tambah_mahasiswa'),
+    path('mahasiswa/edit/<int:id>/', views.edit_mahasiswa, name='edit_mahasiswa'),
 ]
