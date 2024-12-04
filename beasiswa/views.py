@@ -241,3 +241,17 @@ def edit_mahasiswa(request, id):
         'angkatan_list': angkatan_list,
     }
     return render(request, 'edit_mahasiswa.html', context)
+
+def hapus_mahasiswa(request, id):
+    # Ambil data mahasiswa berdasarkan ID atau kembalikan 404 jika tidak ditemukan
+    mahasiswa = get_object_or_404(Mahasiswa, id=id)
+
+    try:
+        # Hapus data mahasiswa
+        mahasiswa.delete()
+        messages.success(request, "Data mahasiswa berhasil dihapus.")
+    except Exception as e:
+        messages.error(request, f"Terjadi kesalahan: {e}")
+    
+    # Redirect ke halaman daftar mahasiswa
+    return redirect("mahasiswa")  # Ganti dengan nama URL daftar mahasiswa
