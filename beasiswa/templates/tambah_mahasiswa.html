@@ -72,6 +72,27 @@
                     <label for="nama" class="form-label">Nama Mahasiswa</label>
                     <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama Mahasiswa" />
                   </div>
+                  <div class="col-12">
+                    <label for="prodi" class="form-label">Program Studi</label>
+                    <select class="form-select" name="prodi" id="prodi" aria-label="Default select example">
+                        <option value="">-- Pilih Program Studi --</option>
+                        {% for prodi in prodi_list %}
+                        <option value="{{ prodi.id }}">{{ prodi.prodi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-12">
+                    <label for="angkatan" class="form-label">Angkatan</label>
+                    <select class="form-select" name="angkatan" id="angkatan" aria-label="Default select example">
+                        <option value="">-- Pilih Tahun Angkatan --</option>
+                        {% for angkatan in angkatan_list %}
+                        <option value="{{ angkatan.id }}">{{ angkatan.angkatan }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+
                   <div class="text-center">
                     <button type="reset" class="btn btn-secondary">Reset</button>
                     <button type="submit" class="btn btn-primary">Submit</button>

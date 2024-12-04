@@ -23,11 +23,10 @@ class Prodi(models.Model):
         verbose_name = "Prodi"
         verbose_name_plural = "Prodi"
         ordering = ["id"]
-        
 
 class Mahasiswa(models.Model):
     id = models.AutoField(primary_key=True)  # Auto-increment ID
-    nim = models.CharField(max_length=15, unique=True)  # NIM harus unik
+    nim = models.CharField(max_length=8, unique=True)  # NIM harus unik
     nama = models.CharField(max_length=100)  # Nama mahasiswa
     prodi = models.ForeignKey(Prodi, on_delete=models.CASCADE, related_name="mahasiswa")  # Relasi ke Prodi
     angkatan = models.ForeignKey(Angkatan, on_delete=models.CASCADE, related_name="mahasiswa")  # Relasi ke Angkatan

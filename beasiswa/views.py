@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Angkatan, Prodi
+from .models import Angkatan, Prodi, Mahasiswa
 
 def home(request):
     return render(request, 'index.html')
@@ -146,6 +146,45 @@ def hapus_prodi(request, id):
 
     return render(request, 'hapus_prodi.html', {'prodi': prodi})
 
-    
 def mahasiswa(request):
     return render(request, 'mahasiswa.html')
+
+def tambah_mahasiswa(request):
+    if request.method == "POST":
+        nim = request.POST.get("nim")
+        nama = request.POST.get("nama")
+        prodi_id = request.POST.get("prodi")
+        angkatan_id = request.POST.get("angkatan")
+
+        # Validasi input
+        if not nim or not nama or not prodi_id or not angkatan_id:
+            messages.error(request, "Semua field harus diisi.")
+            return redirect("tambah_mahasiswa")
+
+        try:
+            # Ambil instance Prodi dan Angkatan berdasarkan ID
+            prodi = Prodi.objects.get(id=prodi_id)
+            angkatan = Angkatan.objects.get(id=angkatan_id)
+
+            # Simpan data mahasiswa
+            mahasiswa = Mahasiswa(nim=nim, nama=nama, prodi=prodi, angkatan=angkatan)
+            mahasiswa.save()
+
+            messages.success(request, "Mahasiswa berhasil ditambahkan.")
+            return redirect("mahasiswa")  # Ganti dengan nama URL yang sesuai
+        except Prodi.DoesNotExist:
+            messages.error(request, "Program Studi tidak ditemukan.")
+        except Angkatan.DoesNotExist:
+            messages.error(request, "Tahun Angkatan tidak ditemukan.")
+        except Exception as e:
+            messages.error(request, f"Terjadi kesalahan: {e}")
+    
+    # Handle GET request
+    angkatan_list = Angkatan.objects.all()  # Ambil semua data Angkatan
+    prodi_list = Prodi.objects.all()  # Ambil semua data Prodi
+
+    context = {
+        'angkatan_list': angkatan_list,
+        'prodi_list': prodi_list,
+    }
+    return render(request, 'tambah_mahasiswa.html', context)
